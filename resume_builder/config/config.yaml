@@ -1,0 +1,70 @@
+# Resume Builder Configuration
+
+# OpenAI Configuration
+openai:
+  api_key: ${OPENAI_API_KEY}
+  model: "gpt-4.1-mini"
+  extraction_temperature: 0.3
+  max_retries: 3
+  timeout: 30
+
+# Weaviate Configuration
+weaviate:
+  type: "local"  # Options: "local" or "cloud"
+  
+  # Local Weaviate settings
+  local:
+    host: "localhost"
+    port: 8080
+    scheme: "http"
+  
+  # Cloud Weaviate settings
+  cloud:
+    cluster_url: ${WEAVIATE_CLUSTER_URL}
+    api_key: ${WEAVIATE_API_KEY}
+  
+  # Collection configuration
+  collection:
+    name: "Experience"
+    vectorizer: "text2vec-openai"
+    vectorizer_config:
+      model: "text-embedding-3-small"
+      dimensions: 1536
+      type: "text"
+
+# Logging Configuration
+logging:
+  level: "INFO"  # Options: DEBUG, INFO, WARNING, ERROR, CRITICAL
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: null  # Set to a file path to log to file, null for console only
+
+# Exa.ai Configuration (for job matching)
+exa:
+  api_key: ${EXA_API_KEY}
+  base_url: "https://api.exa.ai"
+  timeout: 30
+  max_retries: 3
+  
+  # Content extraction settings
+  content_extraction:
+    text: true
+    max_characters: 5000
+    summary_query: "job requirements, qualifications, and key skills"
+    highlights_query: "required experience and technical skills"
+    highlights_per_url: 3
+
+# Job Matching Configuration
+job_matching:
+  max_experiences_to_match: 10
+  min_relevance_score: 0.3
+  search_diversity: true  # Use multiple search strategies
+  refinement_enabled: true
+  enable_caching: true
+  cache_duration_hours: 24
+
+# Application settings
+app:
+  retry_attempts: 3
+  retry_delay: 1.0  # seconds
+  batch_size: 10
+  enable_rich_output: true 
