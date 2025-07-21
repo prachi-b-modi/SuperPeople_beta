@@ -31,6 +31,14 @@ from ..utils.helpers import truncate_text
     help='Company name where the experience was gained'
 )
 @click.option(
+    '--duration',
+    help='Duration of the experience (e.g., "Jan 2020 - Dec 2021")'
+)
+@click.option(
+    '--role',
+    help='Job role or title for this experience'
+)
+@click.option(
     '--extract/--no-extract',
     default=True,
     help='Extract skills and metadata using OpenAI (default: enabled)'
@@ -41,7 +49,7 @@ from ..utils.helpers import truncate_text
     help='Validate input data (default: enabled)'
 )
 @click.pass_context
-def add_experience_command(ctx: click.Context, text: str, company: str, extract: bool, validate: bool):
+def add_experience_command(ctx: click.Context, text: str, company: str, duration: str = None, role: str = None, extract: bool = True, validate: bool = True):
     """
     Add a new professional experience to your database
     
@@ -76,6 +84,8 @@ def add_experience_command(ctx: click.Context, text: str, company: str, extract:
             result = processor.process_experience(
                 text=text,
                 company=company,
+                duration=duration,
+                role=role,
                 extract_metadata=extract,
                 validate_input=validate
             )
@@ -253,6 +263,7 @@ def list_experiences_command(ctx: click.Context, limit: int, company: Optional[s
     
     try:
         with create_processor(config, output_helper) as processor:
+            breakpoint()
             # Get experiences
             experiences = processor.database.list_experiences(
                 limit=limit,
@@ -264,7 +275,9 @@ def list_experiences_command(ctx: click.Context, limit: int, company: Optional[s
                 return
             
             if format == 'json':
-                output_helper.print_json(experiences, title=f"Experiences ({len(experiences)} found)")
+                # Use raw=True for clean JSON output suitable for API consumption
+                json_output = output_helper.print_json(experiences, title=f"Experiences ({len(experiences)} found)", raw=True)
+                
             
             elif format == 'brief':
                 for i, exp in enumerate(experiences, 1):
@@ -361,7 +374,9 @@ def search_experiences_command(ctx: click.Context, query: str, limit: int, min_s
                 return
             
             if format == 'json':
-                output_helper.print_json(results, title=f"Search Results ({len(results)} found)")
+                # Use raw=True for clean JSON output suitable for API consumption
+                json_output = output_helper.print_json(results, title=f"Search Results ({len(results)} found)", raw=True)
+                print(json_output)
             
             elif format == 'table':
                 # Prepare data for table
@@ -616,7 +631,9 @@ def test_job_extraction_command(ctx: click.Context, url: str, format: str):
                 'job_description': job_description.to_dict(),
                 'search_queries': search_queries
             }
-            output_helper.print_json(result, title="Job Extraction Results")
+            # Use raw=True for clean JSON output suitable for API consumption
+            json_output = output_helper.print_json(result, title="Job Extraction Results", raw=True)
+            print(json_output)
         
         else:  # detailed format
             output_helper.print_success("✅ Job extraction completed!\n")
@@ -905,6 +922,55 @@ def refine_experience_command(ctx: click.Context, experience_id: str, company: s
         sys.exit(1)
 
 
+@click.command()
+@click.option(
+    '--id',
+    required=True,
+    help='ID of the experience to delete'
+)
+@click.option(
+    '--confirm/--no-confirm',
+    default=True,
+    help='Confirm before deleting (default: enabled)'
+)
+@click.pass_context
+def delete_experience_command(ctx: click.Context, id: str, confirm: bool):
+    """
+    Delete a specific experience by ID
+    
+    This command removes an experience from the database permanently.
+    Use with caution as this action cannot be undone.
+    """
+    config = ctx.obj['config']
+    output_helper = ctx.obj['output_helper']
+    logger = ctx.obj['logger']
+    
+    output_helper.print_info(f"Preparing to delete experience with ID: {id}")
+    
+    # Confirm deletion if required
+    if confirm:
+        if not click.confirm("Are you sure you want to delete this experience? This action cannot be undone."):
+            output_helper.print_warning("Deletion cancelled by user")
+            return
+    
+    try:
+        # Create and initialize processor
+        with create_processor(config, output_helper) as processor:
+            # Delete the experience
+            success = processor.database.delete_experience(id)
+            
+            if success:
+                output_helper.print_success(f"Successfully deleted experience with ID: {id}")
+            else:
+                output_helper.print_error(f"Failed to delete experience with ID: {id}")
+                sys.exit(1)
+                
+    except Exception as e:
+        logger.error(f"Failed to delete experience: {str(e)}")
+        output_helper.print_error(f"Failed to delete experience: {str(e)}")
+        sys.exit(1)
+
+
 # Helper functions for displaying results
 
 def _dict_to_experience(exp_dict: Dict) -> 'Experience':
@@ -952,7 +1018,9 @@ def _display_job_match_results(output_helper, job_match_result, output_format: s
                 "aggregated_tools": job_match_result.aggregated_tools
             }
         }
-        output_helper.print_json(result_dict, title="Job Matching Results")
+        # Use raw=True for clean JSON output suitable for API consumption
+        json_output = output_helper.print_json(result_dict, title="Job Matching Results", raw=True)
+        print(json_output)
     
     elif output_format == 'summary':
         # Brief summary format
@@ -1030,7 +1098,9 @@ def _display_refined_experiences(output_helper, refined_experiences, output_form
                 } for exp in refined_experiences
             ]
         }
-        output_helper.print_json(result, title="Refined Experiences")
+        # Use raw=True for clean JSON output suitable for API consumption
+        json_output = output_helper.print_json(result, title="Refined Experiences", raw=True)
+        print(json_output)
     else:
         for i, refined_exp in enumerate(refined_experiences, 1):
             output_helper.print(f"\n🏢 **{refined_exp.company}** ({refined_exp.role or 'Not specified'})")

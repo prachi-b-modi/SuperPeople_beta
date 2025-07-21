@@ -22,7 +22,8 @@ from .commands import (
     restore_command,
     test_job_extraction_command,
     match_job_command,
-    refine_experience_command
+    refine_experience_command,
+    delete_experience_command
 )
 
 # Global variables for CLI context
@@ -150,6 +151,7 @@ cli.add_command(restore_command, name="restore")
 cli.add_command(test_job_extraction_command, name="test-job-extraction")
 cli.add_command(match_job_command, name="match-job")
 cli.add_command(refine_experience_command, name="refine-experience")
+cli.add_command(delete_experience_command, name="delete-experience")
 
 
 @cli.command()
@@ -168,6 +170,7 @@ def version(ctx: click.Context):
         "database_type": _config.weaviate_config.type if _config else "Unknown"
     }
     
+    # Version info is typically viewed by humans, so we keep the formatted output
     output_helper.print_json(version_info, title="Resume Builder CLI - Version Information")
 
 
@@ -216,6 +219,7 @@ def config_info(ctx: click.Context):
         }
     }
     
+    # Config info is typically viewed by humans, so we keep the formatted output
     output_helper.print_json(config_info, title="Current Configuration")
 
 
@@ -260,4 +264,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main() 
+    main()

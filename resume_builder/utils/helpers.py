@@ -168,16 +168,33 @@ class RichOutputHelper:
         else:
             print(*args)
     
-    def print_json(self, data: Dict[str, Any], title: str = "JSON Data"):
-        """Print formatted JSON"""
+    def print_json(self, data: Dict[str, Any], title: str = "JSON Data", raw: bool = False) -> str:
+        """Return JSON data as string
+        
+        Args:
+            data: Data to convert to JSON
+            title: Title for the JSON (used only for formatted display)
+            raw: If True, return raw JSON without formatting (for API consumption)
+            
+        Returns:
+            JSON string representation of the data
+        """
+        json_str = safe_json_dumps(data)
+        
+        if raw:
+            # Return raw JSON without any formatting or decorations
+            return json_str
+            
+        # For non-raw mode, still display formatted output but also return the JSON
         if self.enabled and self.console:
-            json_str = safe_json_dumps(data)
             syntax = Syntax(json_str, "json", theme="monokai", line_numbers=True)
             panel = Panel(syntax, title=title, expand=False)
             self.console.print(panel)
         else:
             print(f"\n{title}:")
-            print(safe_json_dumps(data))
+            print(json_str)
+            
+        return json_str
     
     def print_table(self, data: List[Dict[str, Any]], title: str = "Data Table"):
         """Print data as a table"""
@@ -259,4 +276,4 @@ def get_missing_env_vars(required_vars: List[str]) -> List[str]:
         List of missing variable names
     """
     env_vars = validate_environment_variables(required_vars)
-    return [var for var, value in env_vars.items() if value is None] 
+    return [var for var, value in env_vars.items() if value is None]

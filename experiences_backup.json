@@ -1,0 +1,27 @@
+{
+  "backup_date": "2025-07-21T05:40:36.920235+00:00",
+  "database_type": "local",
+  "collection_name": "Experience",
+  "total_experiences": 2,
+  "experiences": [
+    {
+      "original_text": "Developed a machine learning pipeline for customer sentiment analysis using Python, TensorFlow, and NLP techniques, improving product feedback analysis by 60%.",
+      "skills": [
+        "Python",
+        "TensorFlow",
+        "Natural Language Processing (NLP)",
+        "Machine Learning",
+        "Data Analysis",
+        "Pipeline Development",
+        "Problem Solving",
+        "Analytical Thinking"
+      ],
+      "company_name": "AI Solutions Inc",
+      "categories": [
+        "Machine Learning",
+        "Data Science",
+        "Artificial Intelligence",
+        "Customer Sentiment Analysis",
+        "Product Feedback Analysis"
+      ],
+      "created_date": 

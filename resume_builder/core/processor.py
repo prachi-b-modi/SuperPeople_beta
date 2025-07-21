@@ -95,6 +95,8 @@ class ExperienceProcessor:
     def process_experience(self, 
                           text: str, 
                           company: str,
+                          duration: str = None,
+                          role: str = None,
                           extract_metadata: bool = True,
                           validate_input: bool = True) -> Dict[str, Any]:
         """
@@ -103,6 +105,8 @@ class ExperienceProcessor:
         Args:
             text: Professional experience description
             company: Company name
+            duration: Duration of the experience (e.g., "Jan 2020 - Dec 2021")
+            role: Job role or title for this experience
             extract_metadata: Whether to extract skills/categories via OpenAI
             validate_input: Whether to validate input data
             
@@ -140,6 +144,8 @@ class ExperienceProcessor:
             {
                 "text_length": len(text),
                 "company": company,
+                "duration": duration,
+                "role": role,
                 "extraction_enabled": extract_metadata,
                 "validation_enabled": validate_input
             }
@@ -156,7 +162,9 @@ class ExperienceProcessor:
             # Step 2: Create initial experience object
             experience = ExperienceData(
                 original_text=normalize_text(text),
-                company_name=normalize_text(company)
+                company_name=normalize_text(company),
+                duration=duration,
+                role=role
             )
             
             # Step 3: Extract metadata if requested
@@ -442,4 +450,4 @@ def create_processor(config: Config, output_helper: Optional[RichOutputHelper] =
     Returns:
         ExperienceProcessor instance
     """
-    return ExperienceProcessor(config, output_helper) 
+    return ExperienceProcessor(config, output_helper)

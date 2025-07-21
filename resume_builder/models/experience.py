@@ -45,8 +45,8 @@ class Experience:
             id=experience_id or str(hash(experience_data.original_text)),
             company=experience_data.company_name,
             text=experience_data.original_text,
-            role=None,  # Not available in ExperienceData
-            duration=None,  # Not available in ExperienceData
+            role=experience_data.role,
+            duration=experience_data.duration,
             skills=experience_data.skills,
             categories=experience_data.categories,
             created_at=experience_data.created_date
@@ -76,6 +76,8 @@ class ExperienceData:
     """
     original_text: str
     company_name: str
+    duration: Optional[str] = None
+    role: Optional[str] = None
     skills: List[str] = field(default_factory=list)
     categories: List[str] = field(default_factory=list)
     relevant_jobs: List[str] = field(default_factory=list)
@@ -124,6 +126,14 @@ class ExperienceData:
         if self.company_name:
             company_text = f"Company: {self.company_name}"
             parts.append(company_text)
+            
+        if self.role:
+            role_text = f"Role: {self.role}"
+            parts.append(role_text)
+            
+        if self.duration:
+            duration_text = f"Duration: {self.duration}"
+            parts.append(duration_text)
         
         return " | ".join(parts)
     
@@ -134,10 +144,11 @@ class ExperienceData:
         Returns:
             Dictionary representation
         """
-        return 
-        {
+        return {
             "original_text": self.original_text,
             "company_name": self.company_name,
+            "duration": self.duration,
+            "role": self.role,
             "skills": self.skills,
             "categories": self.categories,
             "relevant_jobs": self.relevant_jobs,
@@ -296,4 +307,4 @@ class ExperienceValidator(BaseModel):
             skills=self.skills,
             categories=self.categories,
             relevant_jobs=self.relevant_jobs
-        ) 
+        )
